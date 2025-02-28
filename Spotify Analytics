@@ -1,0 +1,59 @@
+# For this project, I sourced Spotify data from Kaggle, 
+# Created a table to store the data, and then 
+# Utilized SQL to perform detailed analytics on the dataset.
+
+# Creating the table: 
+CREATE TABLE BIT_DB.Spotifydata (
+id integer PRIMARY KEY,
+artist_name varchar NOT NULL,
+track_name varchar NOT NULL,
+track_id varchar NOT NULL,
+popularity integer NOT NULL,
+danceability decimal(4,3) NOT NULL,
+energy decimal(4,3) NOT NULL,
+key integer NOT NULL,
+loudness decimal(5,3) NOT NULL,
+mode integer NOT NULL,
+speechiness decimal(5,4) NOT NULL,
+acousticness decimal(6,5) NOT NULL,
+instrumentalness text NOT NULL,
+liveness decimal(5,4) NOT NULL,
+valence decimal(4,3) NOT NULL,
+tempo decimal(6,3) NOT NULL,
+duration_ms integer NOT NULL,
+time_signature integer NOT NULL 
+)
+
+# Next, I imported the Spotify data from a CSV file into the table,
+# And then conducted data exploration using the following SQL queries.
+
+# I calculated the average popularity, danceability, and energy for each artist and track
+SELECT
+artist_name
+,track_name
+,avg(popularity)
+,avg(danceability)
+,avg(energy)
+FROM BIT_DB.spotifydata
+GROUP BY artist_name, track_name;
+
+# Explored the relationship between a song's danceability level and its average popularity?
+SELECT 
+    CASE 
+        WHEN danceability > 0.7 THEN 'High'
+        WHEN danceability > 0.4 THEN 'Medium'
+        ELSE 'Low'
+    END AS danceability_group,
+    AVG(popularity) AS avg_popularity -- Getting the average popularity for each group
+FROM Spotifydata
+GROUP BY danceability_group
+ORDER BY danceability_group;
+
+# Analyzed how the average popularity of a song changes across different danceability levels
+SELECT "artist_name", COUNT("track_name") AS track_count, 
+       AVG(popularity) AS avg_popularity
+FROM Spotifydata
+GROUP BY "artist_name"
+ORDER BY avg_popularity DESC
+LIMIT 10; 
+
