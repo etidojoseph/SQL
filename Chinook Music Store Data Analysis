@@ -1,0 +1,102 @@
+## In this project, I analyzed the Chinook music store database to uncover key business insights. 
+The database contains sales transactions, customer details, employee records, and music-related data, including artists, albums, and tracks.
+
+## Using SQL, I explored:
+
+# Top 5 Best-Selling Music Genres by Total Sales:
+
+SELECT 
+    g.Name AS Genre, 
+    SUM(i.Total) AS TotalSales
+FROM genres g
+INNER JOIN tracks t ON t.GenreId = g.GenreId
+INNER JOIN invoice_items it ON it.TrackId = t.TrackId
+INNER JOIN invoices i ON i.InvoiceId = it.InvoiceId
+GROUP BY g.Name
+ORDER BY TotalSales DESC
+LIMIT 5;
+
+# Average Order Value (AOV) for Each Custome:
+
+SELECT 
+    c.CustomerId AS Customer_ID,
+    c.FirstName || ' ' || c.LastName AS Customer_Name,
+    COUNT(i.InvoiceId) AS Total_Orders,
+    SUM(i.Total) AS Total_Spent,
+    ROUND(AVG(i.Total), 2) AS Avg_Order_Value
+FROM customers c
+JOIN invoices i ON c.CustomerId = i.CustomerId
+GROUP BY c.CustomerId, Customer_Name
+ORDER BY Avg_Order_Value DESC;
+
+# Employee Performance Based on Total Revenue Generated:
+
+SELECT 
+    e.FirstName || ' ' || e.LastName AS Employee_Name,
+    SUM(i.Total) AS Total_Revenue
+FROM employees e
+JOIN customers c ON e.EmployeeId = c.SupportRepId
+JOIN invoices i ON c.CustomerId = i.CustomerId
+GROUP BY e.EmployeeId, Employee_Name
+ORDER BY Total_Revenue DESC;
+
+# Total Sales for 2009:
+
+SELECT 
+    SUM(Total) AS Total_Sales_2009
+FROM chinook.Invoices
+WHERE InvoiceDate BETWEEN '2009-01-01' AND '2009-12-31';
+
+# Top Sales Agent in 2009:
+
+SELECT 
+    e.FirstName || ' ' || e.LastName AS Agent_Name,
+    SUM(i.Total) AS Total_Sales_2009
+FROM employees e
+JOIN customers c ON e.EmployeeId = c.SupportRepId
+JOIN invoices i ON c.CustomerId = i.CustomerId
+WHERE InvoiceDate LIKE '2009%'
+GROUP BY e.EmployeeId, Agent_Name
+ORDER BY Total_Sales_2009 DESC
+LIMIT 1;
+
+# Invoice Totals with Customer & Sales Agent Details
+
+SELECT 
+    c.FirstName || ' ' || c.LastName AS Customer_Name, 
+    c.Country,
+    e.FirstName || ' ' || e.LastName AS Agent_Name, 
+    i.Total AS Total_Invoice
+FROM chinook.employees e 
+JOIN chinook.customers c ON c.SupportRepId = e.EmployeeId
+JOIN chinook.invoices i ON i.CustomerId = c.CustomerId;
+
+# Total Sales by Sales Agent:
+
+SELECT 
+    e.FirstName || ' ' || e.LastName AS Agent_Name,
+    ROUND(SUM(i.Total), 2) AS Total_Sales
+FROM chinook.Employees e
+JOIN chinook.Customers c ON c.SupportRepId = e.EmployeeId
+JOIN chinook.Invoices i ON i.CustomerId = c.CustomerId
+WHERE e.Title = 'Sales Support Agent' 
+GROUP BY e.EmployeeId, Agent_Name
+ORDER BY Total_Sales DESC;
+
+# Invoices Associated with Each Sales Agent:
+
+SELECT 
+    e.FirstName || ' ' || e.LastName AS Agent_Name,
+    i.InvoiceId AS Invoice_Id
+FROM chinook.Employees e
+JOIN chinook.Customers c ON c.SupportRepId = e.EmployeeId
+JOIN chinook.Invoices i ON i.CustomerId = c.CustomerId
+ORDER BY Agent_Name, Invoice_Id;
+
+
+
+
+
+
+
+
